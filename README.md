@@ -1,44 +1,106 @@
-Brain Tumor Classification using CNN
+Brain Tumor Detection and Classification (MRI) with CNN
 
-This project uses a Convolutional Neural Network (CNN) to classify MRI scans of brains into four distinct categories: glioma tumor, meningioma tumor, pituitary tumor, or no tumor. The model is built with Keras and TensorFlow.
+This project trains a Convolutional Neural Network (CNN) to classify brain MRI scans into four categories:
 
-📋 Dataset
+- glioma tumor
+- meningioma tumor
+- pituitary tumor
+- no tumor
 
-The dataset is organized into Training and Testing folders, each containing subfolders for the four classes. Each class contains hundreds of MRI images used for training and evaluating the model.
+It uses Keras/TensorFlow and a simple yet effective CNN trained on the dataset in `Dataset/`.
 
-🧠 Model Architecture
+## Dataset
 
-The model is a sequential CNN with the following key layers:
+Folder layout (already included in this repo):
 
-Convolutional Layers (Conv2D): To extract features like edges and textures from the images.
+```
+Dataset/
+	Training/
+		glioma_tumor/
+		meningioma_tumor/
+		no_tumor/
+		pituitary_tumor/
+	Testing/
+		glioma_tumor/
+		meningioma_tumor/
+		no_tumor/
+		pituitary_tumor/
+```
 
-Max Pooling Layers (MaxPool2D): To reduce dimensionality and computational load.
+Note: The notebook currently references a Kaggle-style path (`../input/brain-tumor-classification-mri/...`). To run locally on this repo, update these two variables in the notebook to:
 
-Dropout Layers: To prevent overfitting by randomly deactivating neurons during training.
+- `trainPath = "../Dataset/Training"`
+- `testPath = "../Dataset/Testing"`
 
-Dense Layers: Fully connected layers for classification, with a final softmax activation layer that outputs the probability for each of the four classes.
+## Model overview
 
-📈 Results and Performance
+The model is a Sequential CNN with:
 
-The model was trained for 40 epochs and achieved a high training accuracy of approximately 93%. However, the validation loss plot indicates that the model began to overfit the training data, resulting in a final validation accuracy of around 66%. Despite this, the model can still make highly confident and accurate predictions on certain test images.
+- Input size: 150×150×3
+- Conv2D blocks with ReLU activations and MaxPool2D
+- Dropout for regularization
+- Dense(1024, relu) → Dense(4, softmax)
+- Optimizer: Adam (lr=0.001)
+- Loss: categorical_crossentropy
+- Epochs: 40, Batch size: 40
+- Simple horizontal flip data augmentation
 
-🚀 How to Use
+You can find and run the model in:
 
-Clone the repository:
-git clone https://github.com/harshjohiya/Brain-Tumor-Detection-and-Classification.git
+- `Model/brain_tumor_detection_and_classification.ipynb`
 
-Open the brain_tumor_detection_and_classification.ipynb notebook in a Jupyter environment like Kaggle or Google Colab.
+## Quickstart
 
-Ensure the dataset paths are correct.
+1) Create a Python environment and install dependencies (example):
 
-Run the cells sequentially to train the model and see predictions on test images.
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install tensorflow numpy pillow scikit-learn matplotlib pandas jupyter
+```
 
-💡 Future Improvements
+2) Launch Jupyter and open the notebook:
 
-To improve the model's performance and reduce overfitting, future work could include:
+```powershell
+jupyter notebook
+```
 
-Implementing more advanced data augmentation techniques.
+3) In the notebook, adjust `trainPath` and `testPath` as noted above, then run all cells. A trained model will be saved as `classification.h5`.
 
-Using a pre-trained model and applying transfer learning (e.g., VGG16, ResNet).
+## Results
 
-Fine-tuning hyperparameters like the learning rate and dropout rate.
+Example predictions on the test set classes:
+
+| Glioma | Meningioma |
+| --- | --- |
+| ![Glioma example](Results/glioma%20tumor.PNG) | ![Meningioma example](Results/meningioma%20tumor.PNG) |
+
+| No tumor | Pituitary |
+| --- | --- |
+| ![No tumor example](Results/no%20tumor.PNG) | ![Pituitary example](Results/pituitary%20tumor.PNG) |
+
+Training also plots the loss/val-loss curve in the notebook.
+
+## Project structure
+
+```
+README.md                      # You are here
+Dataset/                       # Training/Testing data (4 classes)
+Model/brain_tumor...ipynb      # End-to-end training + evaluation notebook
+Results/                       # Sample prediction results used in this README
+```
+
+## Reproducing locally or in the cloud
+
+- Local (Windows): follow Quickstart above.
+- Google Colab/Kaggle: upload this repo (or mount it), ensure `trainPath`/`testPath` point to the correct folders, then run all cells.
+
+## Notes and tips
+
+- If you see overfitting, consider stronger augmentation (rotation/zoom/shift), adding L2 regularization, or using transfer learning (e.g., MobileNetV2, ResNet50) with fine-tuning.
+- Ensure your GPU drivers/CUDA are set up if training with GPU; otherwise, training will run on CPU and take longer.
+- Images are resized to 150×150. Higher resolutions and a stronger backbone typically improve accuracy at a compute cost.
+
+## Acknowledgments
+
+This work is inspired by public brain tumor MRI datasets (e.g., “brain-tumor-classification-mri” on Kaggle) and common CNN baselines in Keras.
